@@ -429,6 +429,34 @@ class HinmeiProcessor(DataProcessor):
                 InputExample(guid=guid, text_a=text_a, text_b=None, label=label))
         return examples
 
+class HinmeiProcessor2(DataProcessor):
+    """Processor for the Hinmei data set (GLUE version)."""
+
+    def get_train_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        """See base class."""
+        return ["0","1"]
+
+    def _create_examples(self, lines, set_type):
+        """Creates examples for the training and dev sets."""
+        examples = []
+        for (i, line) in enumerate(lines):
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[1]
+            label = line[0]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=None, label=label))
+        return examples
+
 def convert_examples_to_features(examples, label_list, max_seq_length,
                                  tokenizer, output_mode):
     """Loads a data file into a list of `InputBatch`s."""
@@ -586,6 +614,8 @@ def compute_metrics(task_name, preds, labels):
         return {"acc": simple_accuracy(preds, labels)}
     elif task_name == "hinmei":
         return {"mcc": matthews_corrcoef(labels, preds)}
+    elif task_name == "hinmei2":
+        return {"mcc": matthews_corrcoef(labels, preds)}
     else:
         raise KeyError(task_name)
 
@@ -701,6 +731,7 @@ def main():
         "rte": RteProcessor,
         "wnli": WnliProcessor,
         "hinmei": HinmeiProcessor,
+        "hinmei2": HinmeiProcessor2,
     }
 
     output_modes = {
@@ -714,6 +745,7 @@ def main():
         "rte": "classification",
         "wnli": "classification",
         "hinmei": "classification",
+        "hinmei2": "classification",
     }
 
     if args.local_rank == -1 or args.no_cuda:
