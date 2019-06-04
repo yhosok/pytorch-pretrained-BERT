@@ -425,6 +425,8 @@ class HinmeiProcessor(DataProcessor):
             guid = "%s-%s" % (set_type, i)
             text_a = line[1]
             label = line[0]
+            print(line)
+            print(label)
             examples.append(
                 InputExample(guid=guid, text_a=text_a, text_b=None, label=label))
         return examples
@@ -496,6 +498,7 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
         assert len(segment_ids) == max_seq_length
 
         if output_mode == "classification":
+            print(example)
             label_id = label_map[example.label]
         elif output_mode == "regression":
             label_id = float(example.label)
